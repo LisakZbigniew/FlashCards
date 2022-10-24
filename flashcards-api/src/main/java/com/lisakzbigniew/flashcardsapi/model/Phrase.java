@@ -1,5 +1,6 @@
 package com.lisakzbigniew.flashcardsapi.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -7,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+/**A Phrase in a given language*/
 @Entity
 public class Phrase {
 
@@ -14,6 +16,7 @@ public class Phrase {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String content;
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Language lang;
     public Long getId() {
@@ -35,6 +38,13 @@ public class Phrase {
         this.lang = lang;
     }
 
+    @Override
+    public String toString() {
+        return "{" +
+            " content='" + getContent() + "'" +
+            ", lang='" + getLang() + "'" +
+            "}";
+    }
     
     
 }

@@ -1,5 +1,9 @@
 package com.lisakzbigniew.flashcardsapi.model;
 
+/**
+ * A language for a phrase, one supported by google translationAPI
+ * List: https://cloud.google.com/translate/docs/languages
+ */
 public enum Language {
     ENGLISH("en"),
     SPANISH("es");
