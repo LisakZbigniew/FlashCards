@@ -1,4 +1,4 @@
-package com.lisakzbigniew.flashcardsapi.service.phraseRepositiory;
+package com.lisakzbigniew.flashcardsapi.service.repository;
 
 import org.springframework.data.repository.CrudRepository;
 
