@@ -11,24 +11,24 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lisakzbigniew.flashcardsapi.model.Card;
-import com.lisakzbigniew.flashcardsapi.service.FlashCardSevice;
+import com.lisakzbigniew.flashcardsapi.service.implementation.InDatabaseFlashCardSeviceImpl;
 
 @RestController
 @RequestMapping(path = "api/flashcard")
 public class FlashcardsAPIController {
 
     @Autowired
-    private FlashCardSevice flashCardService;
+    private InDatabaseFlashCardSeviceImpl flashCardService;
 
     @GetMapping("/all")
     public @ResponseBody Iterable<Card> listAll(){
-        return flashCardService.findAll();
+        return flashCardService.listCards();
     }
 
     @PostMapping("add")
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody Card addCard(@RequestBody Card newCard){
-        return flashCardService.create(newCard);
+        return flashCardService.saveCard(newCard);
     }
 
 }
