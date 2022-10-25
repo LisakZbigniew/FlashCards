@@ -1,5 +1,7 @@
 package com.lisakzbigniew.flashcardsapi.model;
 
+import java.util.Objects;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -46,5 +48,22 @@ public class Phrase {
             "}";
     }
     
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof Phrase)) {
+            return false;
+        }
+        Phrase phrase = (Phrase) o;
+        return Objects.equals(id, phrase.id) && Objects.equals(content, phrase.content) && Objects.equals(lang, phrase.lang);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, content, lang);
+    }
+
     
 }

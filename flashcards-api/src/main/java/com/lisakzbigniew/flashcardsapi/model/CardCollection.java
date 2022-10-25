@@ -1,6 +1,7 @@
 package com.lisakzbigniew.flashcardsapi.model;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -58,5 +59,22 @@ public class CardCollection {
             ", owner='" + getOwner() + "'" +
             "}";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof CardCollection)) {
+            return false;
+        }
+        CardCollection cardCollection = (CardCollection) o;
+        return Objects.equals(id, cardCollection.id) && Objects.equals(name, cardCollection.name) && Objects.equals(cards, cardCollection.cards) && Objects.equals(owner, cardCollection.owner);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, cards, owner);
+    }
+
     
 }

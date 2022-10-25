@@ -1,5 +1,7 @@
 package com.lisakzbigniew.flashcardsapi.model;
 
+import java.util.Objects;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -36,5 +38,22 @@ public class Tag {
     public String toString() {
         return getValue();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof Tag)) {
+            return false;
+        }
+        Tag tag = (Tag) o;
+        return Objects.equals(id, tag.id) && Objects.equals(value, tag.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, value);
+    }
+
 
 }
