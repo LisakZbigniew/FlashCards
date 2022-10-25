@@ -1,5 +1,7 @@
 package com.lisakzbigniew.flashcardsapi.service;
 
+import java.util.Optional;
+
 import org.springframework.core.metrics.StartupStep.Tags;
 
 import com.lisakzbigniew.flashcardsapi.model.Card;
@@ -22,7 +24,7 @@ public interface FlashCardService {
     
     public boolean cardExists(Card card);
 
-    public Card findCardById(Long id);
+    public Optional<Card> findCardById(Long id);
 
     public Iterable<Card> findCardByLanguage(Language lang);
 
@@ -42,7 +44,7 @@ public interface FlashCardService {
 
     public boolean phraseExists(Phrase phrase);
 
-    public Phrase findPhraseById(Long id);
+    public Optional<Phrase> findPhraseById(Long id);
 
     public Iterable<Phrase> findPhraseByLanguage(Language lang);
 
@@ -58,7 +60,7 @@ public interface FlashCardService {
     
     public boolean tagExists(Tag tag);
 
-    public Tag findTagById(Long id);
+    public Optional<Tag> findTagById(Long id);
 
     //Collection Operations
 
@@ -72,11 +74,11 @@ public interface FlashCardService {
     
     public boolean cardCollectionExists(CardCollection cardCollection);
 
-    public CardCollection findCardCollectionById(Long id);
+    public Optional<CardCollection> findCardCollectionById(Long id);
 
     public Iterable<CardCollection> findCardCollectionByLanguage(Language lang);
 
-    public Iterable<CardCollection> findCardCollectionByowner(String owner);
+    public Iterable<CardCollection> findCardCollectionByOwner(String owner);
 
     public Iterable<CardCollection> findCardCollectionByCard(Card card);
 
