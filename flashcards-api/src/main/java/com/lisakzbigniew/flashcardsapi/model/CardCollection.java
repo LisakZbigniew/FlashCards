@@ -68,7 +68,10 @@ public class CardCollection {
             return false;
         }
         CardCollection cardCollection = (CardCollection) o;
-        return Objects.equals(id, cardCollection.id) && Objects.equals(name, cardCollection.name) && Objects.equals(cards, cardCollection.cards) && Objects.equals(owner, cardCollection.owner);
+        return Objects.equals(id, cardCollection.id) &&
+        Objects.equals(name, cardCollection.name) &&
+        Objects.equals(cards, cardCollection.cards) &&
+        Objects.equals(owner, cardCollection.owner);
     }
 
     @Override
