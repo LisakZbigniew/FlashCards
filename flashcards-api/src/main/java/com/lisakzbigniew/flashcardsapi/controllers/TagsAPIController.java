@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,7 +35,7 @@ public class TagsAPIController {
     }
 
     @RequestMapping(value="/add", method={RequestMethod.PUT,RequestMethod.POST})
-    public ResponseEntity<Tag> requestMethodName(@RequestBody Tag newTag) {
+    public ResponseEntity<Tag> addTag(@RequestBody Tag newTag) {
         return new ResponseEntity<>(service.saveTag(newTag), HttpStatus.CREATED);
     }
     
@@ -44,6 +45,20 @@ public class TagsAPIController {
         Optional<Tag> found = service.findTagById(id);
         if(!found.isPresent()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         else return new ResponseEntity<Tag>(found.get(), HttpStatus.OK);
+    }
+
+    @DeleteMapping(value="/{id}")
+    @ResponseBody
+    public ResponseEntity<Tag> removeTag(@PathVariable Long id){
+        Optional<Tag> found = service.findTagById(id);
+        if(!found.isPresent()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        else{
+            Tag toDelete = found.get();
+            service.removeTag(toDelete);
+            toDelete.setId(null);
+            return new ResponseEntity<Tag>(toDelete, HttpStatus.OK);
+        }
+
     }
 
 
