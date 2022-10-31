@@ -1,5 +1,6 @@
 package com.lisakzbigniew.flashcardsapi.service.implementation;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -8,6 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.google.cloud.translate.v3.LocationName;
+import com.google.cloud.translate.v3.TranslateTextRequest;
+import com.google.cloud.translate.v3.TranslateTextResponse;
+import com.google.cloud.translate.v3.Translation;
+import com.google.cloud.translate.v3.TranslationServiceClient;
 import com.lisakzbigniew.flashcardsapi.model.Card;
 import com.lisakzbigniew.flashcardsapi.model.CardCollection;
 import com.lisakzbigniew.flashcardsapi.model.FamiliarityLevel;
@@ -31,6 +37,9 @@ public class InDatabaseFlashCardSeviceImpl implements FlashCardService{
     private TagRepository tagRepo;
     @Autowired
     private CollectionRepository cardCollectionRepo;
+    @Value("${api.projectId}")
+    private String projectId; 
+
 
     @Value("${streak.treshold}")
     private Integer streakTreshold;
@@ -253,6 +262,72 @@ public class InDatabaseFlashCardSeviceImpl implements FlashCardService{
     public void setCardCollectionRepo(CollectionRepository cardCollectionRepo) {
         this.cardCollectionRepo = cardCollectionRepo;
     }
+    @Override
+    public boolean inServicedLanguages(String lang) {
+        try{
+            Language.valueOf(lang);
+        }catch(IllegalArgumentException e){
+            try{
+                Language.fromGoogleCode(lang);
+            }catch(IllegalArgumentException ex){
+                return false;
+            }
+        }
+        return true;
+    }
+    @Override
+    public Optional<Phrase> translate(Phrase sourcePhrase, String targetLang) {
+        
+        Language targetLanguage;
+        try{
+            targetLanguage = Language.valueOf(targetLang);
+        }catch(IllegalArgumentException e){
+            try{
+                targetLanguage = Language.fromGoogleCode(targetLang);
+            }catch(IllegalArgumentException ex){
+                return Optional.empty();
+            }
+        }
+
+        try{
+            List<Translation> possibleTranslations = translateText(sourcePhrase,targetLanguage);
+            Phrase translatedPhrase = new Phrase();
+            translatedPhrase.setContent(possibleTranslations.get(0).getTranslatedText());
+            translatedPhrase.setLang(targetLanguage);
+            return Optional.ofNullable(translatedPhrase);
+        }catch(IOException e){
+            return Optional.empty();
+        }
+        
+
+    }
+    @Override
+    public Optional<Language> detectServicedLanguage(String phrase) {
+        // TODO Auto-generated method stub
+        return Optional.empty();
+    }
+
+    private List<Translation> translateText(Phrase text, Language targetLanguage)
+    throws IOException {
+
+        try (TranslationServiceClient client = TranslationServiceClient.create()) {
+
+            LocationName parent = LocationName.of(projectId, "global");
+
+            TranslateTextRequest request =
+                TranslateTextRequest.newBuilder()
+                                    .setParent(parent.toString())
+                                    .setMimeType("text/plain")
+                                    .setSourceLanguageCode(text.getLang().googleCode())
+                                    .setTargetLanguageCode(targetLanguage.googleCode())
+                                    .addContents(text.getContent())
+                                    .build();
+
+            TranslateTextResponse response = client.translateText(request);
+
+            return response.getTranslationsList();
+        }
+  }
     
     
 }

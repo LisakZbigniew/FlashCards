@@ -84,6 +84,11 @@ public interface FlashCardService {
 
     //Misc Operations
     
-    
+    public boolean inServicedLanguages(String lang);
+
+    public Optional<Phrase> translate(Phrase sourcePhrase, String targetLang);
+
+    public Optional<Language> detectServicedLanguage(String phrase);
+
 
 }

@@ -18,14 +18,14 @@ public enum Language {
         return this.googleLangCode;
     }
 
-    public static Language fromGoogleCode(String code){
+    public static Language fromGoogleCode(String code) throws IllegalArgumentException{
         switch(code){
             case "en":
                 return ENGLISH;
             case "es":
                 return SPANISH;
             default:
-                return ENGLISH;
+                throw new IllegalArgumentException();
         }
     }
 }
