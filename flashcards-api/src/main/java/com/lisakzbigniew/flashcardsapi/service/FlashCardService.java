@@ -2,8 +2,6 @@ package com.lisakzbigniew.flashcardsapi.service;
 
 import java.util.Optional;
 
-import org.springframework.core.metrics.StartupStep.Tags;
-
 import com.lisakzbigniew.flashcardsapi.model.Card;
 import com.lisakzbigniew.flashcardsapi.model.CardCollection;
 import com.lisakzbigniew.flashcardsapi.model.Language;
@@ -84,6 +82,9 @@ public interface FlashCardService {
 
     //Misc Operations
     
-    
+    public Optional<Language> servicedLanguage(String lang);
+
+    public Optional<Phrase> translate(Phrase sourcePhrase, Language targetLang);
+
 
 }

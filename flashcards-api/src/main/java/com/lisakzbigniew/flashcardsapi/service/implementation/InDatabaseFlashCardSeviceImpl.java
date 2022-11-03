@@ -1,16 +1,28 @@
 package com.lisakzbigniew.flashcardsapi.service.implementation;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.google.cloud.translate.v3.DetectLanguageRequest;
+import com.google.cloud.translate.v3.DetectLanguageResponse;
+import com.google.cloud.translate.v3.DetectedLanguage;
+import com.google.cloud.translate.v3.LocationName;
+import com.google.cloud.translate.v3.TranslateTextRequest;
+import com.google.cloud.translate.v3.TranslateTextResponse;
+import com.google.cloud.translate.v3.Translation;
+import com.google.cloud.translate.v3.TranslationServiceClient;
 import com.lisakzbigniew.flashcardsapi.model.Card;
 import com.lisakzbigniew.flashcardsapi.model.CardCollection;
-import com.lisakzbigniew.flashcardsapi.model.FamiliarityLevel;
 import com.lisakzbigniew.flashcardsapi.model.Language;
 import com.lisakzbigniew.flashcardsapi.model.Phrase;
 import com.lisakzbigniew.flashcardsapi.model.Tag;
@@ -31,9 +43,17 @@ public class InDatabaseFlashCardSeviceImpl implements FlashCardService{
     private TagRepository tagRepo;
     @Autowired
     private CollectionRepository cardCollectionRepo;
+    @Value("${api.projectId}")
+    private String projectId; 
 
-    @Value("${streak.treshold}")
+
+    @Value("${tresholds.comboStreak}")
     private Integer streakTreshold;
+
+    @Value("${tresholds.languageConfidence}")
+    private Float confidenceTreshold;
+
+    private Logger logger = LoggerFactory.getLogger(InDatabaseFlashCardSeviceImpl.class.getName());
 
     @Override
     public Card saveCard(Card card) {
@@ -227,6 +247,50 @@ public class InDatabaseFlashCardSeviceImpl implements FlashCardService{
         }
 
         return filtered;
+    }
+    @Override
+    public Optional<Language> servicedLanguage(String lang) {
+        return Language.parseString(lang);
+    }
+    @Override
+    public Optional<Phrase> translate(Phrase sourcePhrase, Language targetLang) {
+
+        try{
+            List<Translation> possibleTranslations = translateText(sourcePhrase,targetLang);
+            Phrase translatedPhrase = new Phrase();
+            translatedPhrase.setContent(possibleTranslations.get(0).getTranslatedText());
+            translatedPhrase.setLang(targetLang);
+            return Optional.ofNullable(translatedPhrase);
+        }catch(IOException e){
+            logger.info("Google services not available");
+            
+        }
+
+        return Optional.empty();
+
+    }
+
+    private List<Translation> translateText(Phrase text, Language targetLanguage)
+    throws IOException {
+
+        try (TranslationServiceClient client = TranslationServiceClient.create()) {
+
+            LocationName parent = LocationName.of(projectId, "global");
+
+            
+            TranslateTextRequest request =
+                TranslateTextRequest.newBuilder()
+                                    .setParent(parent.toString())
+                                    .setMimeType("text/plain")
+                                    .setSourceLanguageCode(text.getLang().googleCode())
+                                    .setTargetLanguageCode(targetLanguage.googleCode())
+                                    .addContents(text.getContent())
+                                    .build();
+
+            TranslateTextResponse response = client.translateText(request);
+
+            return response.getTranslationsList();
+        }
     }
 
     public FlashcardRepository getFlashCardRepo() {
