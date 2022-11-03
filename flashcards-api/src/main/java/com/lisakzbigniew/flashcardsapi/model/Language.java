@@ -1,5 +1,7 @@
 package com.lisakzbigniew.flashcardsapi.model;
 
+import java.util.Optional;
+
 /**
  * A language for a phrase, one supported by google translationAPI
  * List: https://cloud.google.com/translate/docs/languages
@@ -26,6 +28,18 @@ public enum Language {
                 return SPANISH;
             default:
                 throw new IllegalArgumentException();
+        }
+    }
+
+    public static Optional<Language> parseString(String lang){
+        try{
+            return Optional.of(Language.valueOf(lang.toUpperCase()));
+        }catch(IllegalArgumentException e){
+            try{
+                return Optional.of(Language.fromGoogleCode(lang.toLowerCase()));
+            }catch(IllegalArgumentException ex){
+                return Optional.empty();
+            }
         }
     }
 }
