@@ -50,9 +50,6 @@ public class InDatabaseFlashCardSeviceImpl implements FlashCardService{
     @Value("${tresholds.comboStreak}")
     private Integer streakTreshold;
 
-    @Value("${tresholds.languageConfidence}")
-    private Float confidenceTreshold;
-
     private Logger logger = LoggerFactory.getLogger(InDatabaseFlashCardSeviceImpl.class.getName());
 
     @Override
@@ -286,9 +283,7 @@ public class InDatabaseFlashCardSeviceImpl implements FlashCardService{
                                     .setTargetLanguageCode(targetLanguage.googleCode())
                                     .addContents(text.getContent())
                                     .build();
-
             TranslateTextResponse response = client.translateText(request);
-
             return response.getTranslationsList();
         }
     }

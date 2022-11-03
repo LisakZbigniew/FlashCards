@@ -10,12 +10,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.lisakzbigniew.flashcardsapi.model.Language;
 import com.lisakzbigniew.flashcardsapi.model.Phrase;
 import com.lisakzbigniew.flashcardsapi.service.FlashCardService;
-import org.springframework.web.bind.annotation.RequestMethod;
+
+
 
 
 @RestController
@@ -37,8 +40,8 @@ public class PhrasesAPIController {
     public ResponseEntity<Phrase> addPhrase(@RequestBody Phrase newPhrase) {
         return new ResponseEntity<>(service.savePhrase(newPhrase), HttpStatus.CREATED);
     }
-    
-    @GetMapping(value="/{id}")
+
+    @GetMapping(value="/{id:[\\d]+}")
     @ResponseBody
     public ResponseEntity<Phrase> findPhrase(@PathVariable Long id){
         Optional<Phrase> found = service.findPhraseById(id);
@@ -46,7 +49,19 @@ public class PhrasesAPIController {
         else return new ResponseEntity<Phrase>(found.get(), HttpStatus.OK);
     }
 
-    
 
+    @GetMapping(value="/translate/{targetLang}")
+    @ResponseBody
+    public ResponseEntity<Phrase> getMeth(@RequestBody Phrase sourcePhrase, @PathVariable String targetLang) {
+        Optional<Language> targetLanguage = service.servicedLanguage(targetLang);
+        if(!targetLanguage.isPresent()){
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        Optional<Phrase> translatedPhrase = service.translate(sourcePhrase,targetLanguage.get());
+        
+        if(!translatedPhrase.isPresent()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        else return new ResponseEntity<>(translatedPhrase.get(), HttpStatus.OK);
+    }
 
 }
