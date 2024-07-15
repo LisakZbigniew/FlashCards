@@ -6,8 +6,6 @@ import com.lisakzbigniew.flashcardsapi.model.Card;
 import com.lisakzbigniew.flashcardsapi.model.CardCollection;
 import com.lisakzbigniew.flashcardsapi.model.Language;
 import com.lisakzbigniew.flashcardsapi.model.Phrase;
-import com.lisakzbigniew.flashcardsapi.model.Tag;
-
 public interface FlashCardService {
     
 
@@ -24,13 +22,7 @@ public interface FlashCardService {
 
     public Optional<Card> findCardById(Long id);
 
-    public Iterable<Card> findCardByLanguage(Language lang);
-
-    public Iterable<Card> findCardByTag(Tag tag);
-
-    public Card addToStreak(Card card);
-
-    public Card resetStreak(Card card);
+    public Iterable<Card> listCardsByLanguage(Language lang);
 
     //Phrase Operations
 
@@ -40,25 +32,13 @@ public interface FlashCardService {
 
     public Phrase updatePhrase(Phrase phrase);
 
+    public void removePhrase(Phrase phrase);
+
     public boolean phraseExists(Phrase phrase);
 
     public Optional<Phrase> findPhraseById(Long id);
 
-    public Iterable<Phrase> findPhraseByLanguage(Language lang);
-
-    //Tag Operations
-
-    public Tag saveTag(Tag tag);
-
-    public Iterable<Tag> listTags();
-
-    public Tag updateTag(Tag updatedTag);
-
-    public void removeTag(Tag tag);
-    
-    public boolean tagExists(Tag tag);
-
-    public Optional<Tag> findTagById(Long id);
+    public Iterable<Phrase> findPhrasesByLanguage(Language lang);
 
     //Collection Operations
 
@@ -74,17 +54,10 @@ public interface FlashCardService {
 
     public Optional<CardCollection> findCardCollectionById(Long id);
 
-    public Iterable<CardCollection> findCardCollectionByLanguage(Language lang);
+    public Iterable<CardCollection> findCardCollectionsByLanguage(Language lang);
 
-    public Iterable<CardCollection> findCardCollectionByOwner(String owner);
+    public Iterable<CardCollection> findCardCollectionsByOwner(String owner);
 
-    public Iterable<CardCollection> findCardCollectionByCard(Card card);
-
-    //Misc Operations
-    
-    public Optional<Language> servicedLanguage(String lang);
-
-    public Optional<Phrase> translate(Phrase sourcePhrase, Language targetLang);
-
+    public Iterable<CardCollection> findCardCollectionsByCard(Card card);
 
 }

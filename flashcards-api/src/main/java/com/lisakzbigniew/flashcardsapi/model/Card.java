@@ -1,109 +1,80 @@
 package com.lisakzbigniew.flashcardsapi.model;
 
-import java.util.List;
 import java.util.Objects;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToOne;
-
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 
 /**
- * Entity representing a flash card with 
+ * Entity representing a flash card with
  * phrases A and B beeing translations of one another
  */
 @Entity
 public class Card {
-    
+
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @OneToOne(optional = false) 
-    private Phrase a;
-    @OneToOne(optional = false) 
-    private Phrase b;
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private FamiliarityLevel level;
-    @Column(nullable = false)
-    private int streak;
-    @ManyToMany private List<Tag> tags;
-    private String hint;
-    
+
+    @OneToOne(optional = false)
+    private Phrase firstPhrase;
+
+    @OneToOne(optional = false)
+    private Phrase secondPhrase;
 
     public Long getId() {
         return id;
     }
+
     public void setId(Long id) {
         this.id = id;
     }
-    public Phrase getA() {
-        return a;
+
+    public Phrase getFirstPhrase() {
+        return firstPhrase;
     }
-    public void setA(Phrase a) {
-        this.a = a;
+
+    public void setFirstPhrase(Phrase a) {
+        this.firstPhrase = a;
     }
-    public Phrase getB() {
-        return b;
+
+    public Phrase getSecondPhrase() {
+        return secondPhrase;
     }
-    public void setB(Phrase b) {
-        this.b = b;
+
+    public void setSecondPhrase(Phrase b) {
+        this.secondPhrase = b;
     }
-    public FamiliarityLevel getLevel() {
-        return level;
-    }
-    public void setLevel(FamiliarityLevel level) {
-        this.level = level;
-    }
-    public int getStreak() {
-        return streak;
-    }
-    public void setStreak(int streak) {
-        this.streak = streak;
-    }
-    public List<Tag> getTags() {
-        return tags;
-    }
-    public void setTags(List<Tag> tags) {
-        this.tags = tags;
-    }
-    public String getHint() {
-        return hint;
-    }
-    public void setHint(String hint) {
-        this.hint = hint;
+
+    public boolean inLang(Language lang){
+        return firstPhrase.inLang(lang) || secondPhrase.inLang(lang);
     }
 
     @Override
     public String toString() {
-        return "{" +
-            " a='" + getA() + "'" +
-            ", b='" + getB() + "'" +
-            "}";
+        return "{\n" +
+                "firstWord = " + getFirstPhrase().toString() + ", \n" +
+                "secondWord = " + getSecondPhrase().toString() + " \n" +
+                "} \n";
     }
 
     @Override
     public boolean equals(Object o) {
         if (o == this)
             return true;
-        if (!(o instanceof Card)) {
+        if (!(o instanceof Card card)) {
             return false;
         }
-        Card card = (Card) o;
-        return Objects.equals(id, card.id) && Objects.equals(a, card.a) && Objects.equals(b, card.b) && Objects.equals(level, card.level) && streak == card.streak && Objects.equals(tags, card.tags) && Objects.equals(hint, card.hint);
+        return Objects.equals(id, card.id)
+                || Objects.equals(firstPhrase, card.firstPhrase) && Objects.equals(secondPhrase, card.secondPhrase);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, a, b, level, streak, tags, hint);
+        return Objects.hash(id, firstPhrase, secondPhrase);
     }
 
-   
 }

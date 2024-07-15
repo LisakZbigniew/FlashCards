@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lisakzbigniew.flashcardsapi.model.Card;
-import com.lisakzbigniew.flashcardsapi.service.implementation.InDatabaseFlashCardSeviceImpl;
+import com.lisakzbigniew.flashcardsapi.service.FlashCardService;
 
 @RestController
 @RequestMapping(path = "api/flashcard")
 public class FlashcardsAPIController {
 
     @Autowired
-    private InDatabaseFlashCardSeviceImpl flashCardService;
+    private FlashCardService flashCardService;
 
     @GetMapping("/all")
     public @ResponseBody Iterable<Card> listAll(){

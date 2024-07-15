@@ -14,54 +14,38 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lisakzbigniew.flashcardsapi.model.Language;
 import com.lisakzbigniew.flashcardsapi.model.Phrase;
 import com.lisakzbigniew.flashcardsapi.service.FlashCardService;
-
-
-
 
 @RestController
 @RequestMapping("/api/phrases")
 public class PhrasesAPIController {
-    
+
     @Autowired
     private FlashCardService service;
 
     @GetMapping("/list")
     @ResponseBody
-    public Phrase[] listPhrases(){
-    ArrayList<Phrase> list = new ArrayList<Phrase>();
-        service.listPhrases().iterator().forEachRemaining(list::add);;
+    public Phrase[] listPhrases() {
+        ArrayList<Phrase> list = new ArrayList<Phrase>();
+        service.listPhrases().iterator().forEachRemaining(list::add);
+        ;
         return list.toArray(new Phrase[list.size()]);
     }
 
-    @RequestMapping(value="/add", method={RequestMethod.PUT,RequestMethod.POST})
+    @RequestMapping(value = "/add", method = { RequestMethod.PUT, RequestMethod.POST })
     public ResponseEntity<Phrase> addPhrase(@RequestBody Phrase newPhrase) {
         return new ResponseEntity<>(service.savePhrase(newPhrase), HttpStatus.CREATED);
     }
 
-    @GetMapping(value="/{id:[\\d]+}")
+    @GetMapping(value = "/{id:[\\d]+}")
     @ResponseBody
-    public ResponseEntity<Phrase> findPhrase(@PathVariable Long id){
+    public ResponseEntity<Phrase> findPhrase(@PathVariable Long id) {
         Optional<Phrase> found = service.findPhraseById(id);
-        if(!found.isPresent()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        else return new ResponseEntity<Phrase>(found.get(), HttpStatus.OK);
-    }
-
-
-    @GetMapping(value="/translate/{targetLang}")
-    @ResponseBody
-    public ResponseEntity<Phrase> getMeth(@RequestBody Phrase sourcePhrase, @PathVariable String targetLang) {
-        Optional<Language> targetLanguage = service.servicedLanguage(targetLang);
-        if(!targetLanguage.isPresent()){
+        if (!found.isPresent())
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
-        Optional<Phrase> translatedPhrase = service.translate(sourcePhrase,targetLanguage.get());
-        
-        if(!translatedPhrase.isPresent()) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        else return new ResponseEntity<>(translatedPhrase.get(), HttpStatus.OK);
+        else
+            return new ResponseEntity<Phrase>(found.get(), HttpStatus.OK);
     }
 
 }

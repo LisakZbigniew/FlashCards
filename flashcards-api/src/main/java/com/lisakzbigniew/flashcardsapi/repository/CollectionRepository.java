@@ -6,6 +6,6 @@ import org.springframework.data.repository.CrudRepository;
 
 import com.lisakzbigniew.flashcardsapi.model.CardCollection;
 
-public interface CollectionRepository extends CrudRepository<CardCollection,Long>{
+public interface CollectionRepository extends CrudRepository<CardCollection, Long> {
     List<CardCollection> findByOwner(String owner);
 }

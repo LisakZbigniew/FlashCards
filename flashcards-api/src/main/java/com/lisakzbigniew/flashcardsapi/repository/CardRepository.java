@@ -4,6 +4,6 @@ import org.springframework.data.repository.CrudRepository;
 
 import com.lisakzbigniew.flashcardsapi.model.Card;
 
-public interface FlashcardRepository extends CrudRepository<Card,Long> {
+public interface CardRepository extends CrudRepository<Card, Long> {
 
 }
