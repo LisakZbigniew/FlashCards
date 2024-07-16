@@ -21,14 +21,14 @@ public class FlashcardsAPIController {
     private FlashCardService flashCardService;
 
     @GetMapping("/all")
-    public @ResponseBody Iterable<Card> listAll(){
+    public @ResponseBody Iterable<Card> listAll() {
         return flashCardService.listCards();
     }
 
     @PostMapping("add")
     @ResponseStatus(HttpStatus.CREATED)
-    public @ResponseBody Card addCard(@RequestBody Card newCard){
-        return flashCardService.saveCard(newCard);
+    public @ResponseBody Card addCard(@RequestBody Card newCard) {
+        return flashCardService.addCard(newCard);
     }
 
 }

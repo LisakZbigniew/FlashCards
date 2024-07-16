@@ -1,20 +1,20 @@
 package com.lisakzbigniew.flashcardsapi.service.implementation;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
+import org.apache.commons.collections4.IterableUtils;
+import org.hibernate.dialect.lock.OptimisticEntityLockException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.lisakzbigniew.flashcardsapi.model.Card;
-import com.lisakzbigniew.flashcardsapi.model.CardCollection;
 import com.lisakzbigniew.flashcardsapi.model.Language;
 import com.lisakzbigniew.flashcardsapi.model.Phrase;
 import com.lisakzbigniew.flashcardsapi.repository.CardRepository;
-import com.lisakzbigniew.flashcardsapi.repository.CollectionRepository;
 import com.lisakzbigniew.flashcardsapi.repository.PhraseRepository;
 import com.lisakzbigniew.flashcardsapi.service.FlashCardService;
 
@@ -29,169 +29,61 @@ public class DatabaseFlashCardServiceImpl implements FlashCardService {
     @Autowired
     private PhraseRepository phraseRepo;
 
-    @Autowired
-    private CollectionRepository cardCollectionRepo;
-
     private Logger logger = LoggerFactory.getLogger(DatabaseFlashCardServiceImpl.class.getName());
 
-    @Override
-    public Card saveCard(@Nonnull Card card) {
-        card.setFirstPhrase(savePhrase(card.getFirstPhrase()));
-        card.setSecondPhrase(savePhrase(card.getSecondPhrase()));
-
-        return cardRepo.save(card);
-    }
+    private Random randomGenerator = new Random(System.currentTimeMillis());
 
     @Override
-    public Iterable<Card> listCards() {
-        return cardRepo.findAll();
-    }
-
-    @Override
-    public Card updateCard(@Nonnull Card updatedCard) {
-        return saveCard(updatedCard);
-    }
-
-    @Override
-    public void removeCard(@Nonnull Card card) {
-        cardRepo.delete(card);
-    }
-
-    @Override
-    public boolean cardExists(@Nonnull Card card) {
-        return card.getId() != null && cardRepo.existsById(card.getId());
-    }
-
-    @Override
-    public Optional<Card> findCardById(Long id) {
-        if (id == null)
-            return Optional.empty();
-        return cardRepo.findById(id);
-    }
-
-    @Override
-    public Iterable<Card> listCardsByLanguage(Language lang) {
-        List<Card> filtered = new ArrayList<>();
-        listCards().forEach(card -> {
-            if (card.inLang(lang))
-                filtered.add(card);
-        });
-        return filtered;
-    }
-
-    @Override
-    public Phrase savePhrase(@Nonnull Phrase phrase) {
-        return phraseRepo.save(phrase);
-    }
-
-    @Override
-    public Iterable<Phrase> listPhrases() {
-        return phraseRepo.findAll();
-    }
-
-    @Override
-    public Phrase updatePhrase(@Nonnull Phrase phrase) {
-        return savePhrase(phrase);
-    }
-
-    @Override
-    public void removePhrase(@Nonnull Phrase phrase) {
-        phraseRepo.delete(phrase);
-    }
-
-    @Override
-    public boolean phraseExists(Phrase phrase) {
-        return phrase.getId() != null && phraseRepo.existsById(phrase.getId());
-    }
-
-    @Override
-    public Optional<Phrase> findPhraseById(Long id) {
-        if (id == null)
-            return Optional.empty();
-        return phraseRepo.findById(id);
-    }
-
-    @Override
-    public Iterable<Phrase> findPhrasesByLanguage(Language lang) {
-        List<Phrase> filtered = new ArrayList<>();
-        listPhrases().forEach(p -> {
-            if (p.inLang(lang)) {
-                filtered.add(p);
-            }
-        });
-        return filtered;
-    }
-
-    @Override
-    public CardCollection saveCardCollection(@Nonnull CardCollection cardCollection) {
-        List<Card> updatedList = new ArrayList<>();
-
-        for (Card card : cardCollection.getCards()) {
-            updatedList.add(saveCard(card));
+    public Card addCard(@Nonnull Card card) {
+        if (card == null) {
+            throw new IllegalArgumentException("Attempted to save null card");
+        }
+        if (card.getFirstPhrase() == null || card.getSecondPhrase() == null) {
+            throw new IllegalArgumentException("Attempted to save card with null phrase");
         }
 
-        cardCollection.setCards(updatedList);
+        card.setFirstPhrase(phraseRepo.save(card.getFirstPhrase()));
+        card.setSecondPhrase(phraseRepo.save(card.getSecondPhrase()));
+        Card newCard = cardRepo.save(card);
 
-        return cardCollectionRepo.save(cardCollection);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Saved card %s", newCard.toString());
+        }
+
+        return newCard;
     }
 
     @Override
-    public Iterable<CardCollection> listCardCollections() {
-        return cardCollectionRepo.findAll();
+    public List<Card> listCards() {
+        return IterableUtils.toList(cardRepo.findAll());
     }
 
     @Override
-    public CardCollection updateCardCollection(@Nonnull CardCollection updatedCardCollection) {
-        return saveCardCollection(updatedCardCollection);
+    public boolean removeCard(@Nonnull Card card) {
+        try {
+            cardRepo.delete(card);
+        } catch (OptimisticEntityLockException e) {
+            logger.debug("Couldn't remove card entity: %s", e.getMessage());
+            return false;
+        }
+        return true;
     }
 
     @Override
-    public void removeCardCollection(@Nonnull CardCollection cardCollection) {
-        cardCollectionRepo.delete(cardCollection);
+    public List<Phrase> listPhrasesInLanguage(Language lang) {
+        return IterableUtils.toList(phraseRepo.findByLang(lang));
     }
 
     @Override
-    public boolean cardCollectionExists(@Nonnull CardCollection cardCollection) {
-        return cardCollection.getId() != null &&
-                cardCollectionRepo.existsById(cardCollection.getId());
+    public Optional<Card> getRandomCard() {
+        return Optional.ofNullable(
+                randomFromList(IterableUtils.toList(cardRepo.findAll())));
     }
 
-    @Override
-    public Optional<CardCollection> findCardCollectionById(Long id) {
-        if (id == null)
-            return Optional.empty();
-        return cardCollectionRepo.findById(id);
-    }
-
-    @Override
-    public Iterable<CardCollection> findCardCollectionsByLanguage(Language lang) {
-        List<CardCollection> filtered = new ArrayList<>();
-
-        listCardCollections().forEach(collection -> {
-            if (collection.getCards().stream().anyMatch(c -> c.inLang(lang))) {
-                filtered.add(collection);
-            }
-        });
-
-        return filtered;
-    }
-
-    @Override
-    public Iterable<CardCollection> findCardCollectionsByOwner(String owner) {
-        return cardCollectionRepo.findByOwner(owner);
-    }
-
-    @Override
-    public Iterable<CardCollection> findCardCollectionsByCard(Card card) {
-        List<CardCollection> filtered = new ArrayList<>();
-
-        listCardCollections().forEach(collection -> {
-            if (collection.getCards().stream().anyMatch(c -> c.equals(card))) {
-                filtered.add(collection);
-            }
-        });
-
-        return filtered;
+    private <E> E randomFromList(List<E> list) {
+        if (list.size() == 0)
+            return null;
+        return list.get(randomGenerator.nextInt(list.size()));
     }
 
 }
