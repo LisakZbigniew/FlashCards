@@ -22,7 +22,7 @@ public class Phrase {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private Language lang;
+    private Language language;
 
     public Long getId() {
         return id;
@@ -40,23 +40,23 @@ public class Phrase {
         this.content = content;
     }
 
-    public Language getLang() {
-        return lang;
+    public Language getLanguage() {
+        return language;
     }
 
-    public void setLang(Language lang) {
-        this.lang = lang;
+    public void setLanguage(Language lang) {
+        this.language = lang;
     }
 
-    public boolean inLang(Language lang){
-        return this.lang.equals(lang);
+    public boolean inLanguage(Language lang){
+        return this.language.equals(lang);
     }
 
     @Override
     public String toString() {
         return "{\n" +
                 "content = " + getContent().toString() + ", \n" +
-                "lang = " + getLang().toString() + " \n" +
+                "language = " + getLanguage().toString() + " \n" +
                 "} \n";
     }
 
@@ -68,13 +68,13 @@ public class Phrase {
             return false;
         }
         return Objects.equals(id, phrase.id) ||
-                Objects.equals(content, phrase.content) &&
-                        Objects.equals(lang, phrase.lang);
+                content.equals(phrase.content) &&
+                        Objects.equals(language, phrase.language);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, content, lang);
+        return Objects.hash(id, content, language);
     }
 
 }

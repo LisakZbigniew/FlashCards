@@ -42,15 +42,25 @@ public class DatabaseFlashCardServiceImpl implements FlashCardService {
             throw new IllegalArgumentException("Attempted to save card with null phrase");
         }
 
-        card.setFirstPhrase(phraseRepo.save(card.getFirstPhrase()));
-        card.setSecondPhrase(phraseRepo.save(card.getSecondPhrase()));
-        Card newCard = cardRepo.save(card);
+        card.setFirstPhrase(savePhrase(card.getFirstPhrase()));
+        card.setSecondPhrase(savePhrase(card.getSecondPhrase()));
+        card.fixPhraseOrder();
+
+        Card newCard = cardRepo.findByFirstPhraseAndSecondPhrase(
+                                                    card.getFirstPhrase(),
+                                                    card.getSecondPhrase())
+                                            .orElseGet(()->cardRepo.save(card));
 
         if (logger.isDebugEnabled()) {
             logger.debug("Saved card %s", newCard.toString());
         }
 
         return newCard;
+    }
+
+    private Phrase savePhrase(Phrase toSave){
+        return phraseRepo.findByContentAndLanguage(toSave.getContent(), toSave.getLanguage())
+                    .orElseGet(() -> phraseRepo.save(toSave));
     }
 
     @Override
@@ -71,7 +81,7 @@ public class DatabaseFlashCardServiceImpl implements FlashCardService {
 
     @Override
     public List<Phrase> listPhrasesInLanguage(Language lang) {
-        return IterableUtils.toList(phraseRepo.findByLang(lang));
+        return IterableUtils.toList(phraseRepo.findByLanguage(lang));
     }
 
     @Override

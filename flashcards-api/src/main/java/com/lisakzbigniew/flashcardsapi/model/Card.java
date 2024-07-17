@@ -6,7 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 
 /**
  * Entity representing a flash card with
@@ -19,10 +19,10 @@ public class Card {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
     private Phrase firstPhrase;
 
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
     private Phrase secondPhrase;
 
     public Long getId() {
@@ -49,8 +49,17 @@ public class Card {
         this.secondPhrase = b;
     }
 
-    public boolean inLang(Language lang){
-        return firstPhrase.inLang(lang) || secondPhrase.inLang(lang);
+    public boolean inLanguage(Language lang){
+        return firstPhrase.inLanguage(lang) || secondPhrase.inLanguage(lang);
+    }
+
+    public void fixPhraseOrder(){
+        if(secondPhrase != null && 
+                (firstPhrase == null || secondPhrase.getLanguage().compareTo(firstPhrase.getLanguage()) < 0)){
+            Phrase tmp = firstPhrase;
+            firstPhrase = secondPhrase;
+            secondPhrase = tmp;
+        }
     }
 
     @Override
@@ -69,7 +78,8 @@ public class Card {
             return false;
         }
         return Objects.equals(id, card.id)
-                || Objects.equals(firstPhrase, card.firstPhrase) && Objects.equals(secondPhrase, card.secondPhrase);
+                || (firstPhrase.equals(card.firstPhrase) && secondPhrase.equals(card.secondPhrase))
+                || (secondPhrase.equals(card.firstPhrase) && firstPhrase.equals(card.secondPhrase));
     }
 
     @Override

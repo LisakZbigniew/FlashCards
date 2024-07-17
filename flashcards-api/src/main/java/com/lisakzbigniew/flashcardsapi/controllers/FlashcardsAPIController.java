@@ -14,18 +14,18 @@ import com.lisakzbigniew.flashcardsapi.model.Card;
 import com.lisakzbigniew.flashcardsapi.service.FlashCardService;
 
 @RestController
-@RequestMapping(path = "api/flashcard")
+@RequestMapping(path = "api/flashcards")
 public class FlashcardsAPIController {
 
     @Autowired
     private FlashCardService flashCardService;
 
-    @GetMapping("/all")
+    @GetMapping("/")
     public @ResponseBody Iterable<Card> listAll() {
         return flashCardService.listCards();
     }
 
-    @PostMapping("add")
+    @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
     public @ResponseBody Card addCard(@RequestBody Card newCard) {
         return flashCardService.addCard(newCard);
