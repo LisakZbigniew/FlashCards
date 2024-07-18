@@ -25,6 +25,14 @@ public class Card {
     @ManyToOne(optional = false)
     private Phrase secondPhrase;
 
+    public Card() {
+    }
+
+    public Card(Phrase first, Phrase second) {
+        firstPhrase = first;
+        secondPhrase = second;
+    }
+
     public Long getId() {
         return id;
     }
@@ -49,13 +57,13 @@ public class Card {
         this.secondPhrase = b;
     }
 
-    public boolean inLanguage(Language lang){
+    public boolean inLanguage(Language lang) {
         return firstPhrase.inLanguage(lang) || secondPhrase.inLanguage(lang);
     }
 
-    public void fixPhraseOrder(){
-        if(secondPhrase != null && 
-                (firstPhrase == null || secondPhrase.getLanguage().compareTo(firstPhrase.getLanguage()) < 0)){
+    public void fixPhraseOrder() {
+        if (secondPhrase != null &&
+                (firstPhrase == null || secondPhrase.getLanguage().compareTo(firstPhrase.getLanguage()) < 0)) {
             Phrase tmp = firstPhrase;
             firstPhrase = secondPhrase;
             secondPhrase = tmp;

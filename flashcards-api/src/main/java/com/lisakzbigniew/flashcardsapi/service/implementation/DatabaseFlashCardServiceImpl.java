@@ -33,6 +33,11 @@ public class DatabaseFlashCardServiceImpl implements FlashCardService {
 
     private Random randomGenerator = new Random(System.currentTimeMillis());
 
+    public DatabaseFlashCardServiceImpl(CardRepository cardRepo, PhraseRepository phraseRepo) {
+        this.cardRepo = cardRepo;
+        this.phraseRepo = phraseRepo;
+    }
+
     @Override
     public Card addCard(@Nonnull Card card) {
         if (card == null) {
@@ -47,9 +52,9 @@ public class DatabaseFlashCardServiceImpl implements FlashCardService {
         card.fixPhraseOrder();
 
         Card newCard = cardRepo.findByFirstPhraseAndSecondPhrase(
-                                                    card.getFirstPhrase(),
-                                                    card.getSecondPhrase())
-                                            .orElseGet(()->cardRepo.save(card));
+                card.getFirstPhrase(),
+                card.getSecondPhrase())
+                .orElseGet(() -> cardRepo.save(card));
 
         if (logger.isDebugEnabled()) {
             logger.debug("Saved card %s", newCard.toString());
@@ -58,9 +63,9 @@ public class DatabaseFlashCardServiceImpl implements FlashCardService {
         return newCard;
     }
 
-    private Phrase savePhrase(Phrase toSave){
+    private Phrase savePhrase(Phrase toSave) {
         return phraseRepo.findByContentAndLanguage(toSave.getContent(), toSave.getLanguage())
-                    .orElseGet(() -> phraseRepo.save(toSave));
+                .orElseGet(() -> phraseRepo.save(toSave));
     }
 
     @Override

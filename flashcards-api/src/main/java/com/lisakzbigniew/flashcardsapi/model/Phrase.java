@@ -24,6 +24,14 @@ public class Phrase {
     @Enumerated(EnumType.STRING)
     private Language language;
 
+    public Phrase() {
+    }
+
+    public Phrase(String content, Language lang) {
+        this.content = content;
+        this.language = lang;
+    }
+
     public Long getId() {
         return id;
     }
@@ -48,7 +56,7 @@ public class Phrase {
         this.language = lang;
     }
 
-    public boolean inLanguage(Language lang){
+    public boolean inLanguage(Language lang) {
         return this.language.equals(lang);
     }
 
