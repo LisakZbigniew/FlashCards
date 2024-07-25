@@ -1,0 +1,47 @@
+services:
+  cards:
+    build:
+      context: .
+    networks:
+      - api-network
+    ports:
+      - 8080:8080
+    secrets:
+      - db-password
+    environment:
+      - POSTGRES_PASS_FILE=/run/secrets/db-password
+      - POSTGRES_URL=jdbc:postgresql://db:5432/flashcards
+      - POSTGRES_USER=postgres
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres
+    restart: always
+    user: postgres
+    secrets:
+      - db-password
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=flashcards
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
+    expose:
+      - 5432
+    networks:
+      - api-network
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  db-data:
+networks:
+  api-network:
+secrets:
+  db-password:
+    environment: POSTGRES_PASS
+
+
+
